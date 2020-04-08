@@ -197,13 +197,10 @@ namespace ConsoleApp
                             scripts.TryGetValue(result.m_Name, out var value);
                             scripts[result.m_Name] = value + 1;
 
-                            if (monoBehaviour.m_Name == "")
-                                Console.WriteLine(asset.type + "[" + _gameObject.m_Name + "] " + result.m_Name);
-                            else
-                                Console.WriteLine(asset.type + "[" + monoBehaviour.m_Name + "] " + result.m_Name);
+                            Console.WriteLine(asset.type + "[" + (_gameObject?.m_Name ?? monoBehaviour.m_Name) + "] " + result.m_Name);
                             
                             if (result.m_Name == "UIAtlas" || result.m_Name == "NGUIAtlas")//NGUIFont
-                                monoBehaviour.ExportUISpriteData();
+                                monoBehaviour.ExportUISpriteData(_gameObject?.m_Name ?? monoBehaviour.m_Name);
                             break;
                         case Shader shader:
                             //Console.WriteLine(asset.type);

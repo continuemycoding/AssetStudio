@@ -148,6 +148,11 @@
     <Compile Include="TypeTreeNode.cs" />
     <Compile Include="WebFile.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\LitJson\LitJSON.csproj">
+      <Project>{f0b6c7bc-4ac7-4798-9f62-8e32b6f5e2ec}</Project>
+      <Name>LitJSON</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
