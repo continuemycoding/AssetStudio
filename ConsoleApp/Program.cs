@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleApp
 {
@@ -119,26 +121,43 @@ namespace ConsoleApp
             assetsManager.LoadFolder(@"C:\Users\lin\Desktop\Data");
 
             var count = 0;
-            
+
+            var scripts = new Dictionary<string, int>();
+
             foreach (var assetsFile in assetsManager.assetsFileList)
             {
                 foreach (var asset in assetsFile.Objects.Values)
                 {
                     var exportPath = @"C:\Users\lin\Desktop\Data\" + asset.type + @"\";
 
-                    switch(asset.type)
+                    switch (asset.type)
                     {
                         case ClassIDType.Light:
+                        case ClassIDType.LightProbes:
+                        case ClassIDType.LightmapSettings:
+                        case ClassIDType.RenderSettings:
                         case ClassIDType.Camera:
                         case ClassIDType.ComputeShader:
                         case ClassIDType.Rigidbody:
                         case ClassIDType.PreloadData:
                         case ClassIDType.Canvas:
                         case ClassIDType.CanvasRenderer:
+                        case ClassIDType.BoxCollider:
+                        case ClassIDType.BoxCollider2D:
+                        case ClassIDType.CapsuleCollider:
+                        case ClassIDType.CapsuleCollider2D:
+                        case ClassIDType.CircleCollider2D:
+                        case ClassIDType.MeshCollider:
+                        case ClassIDType.ParticleSystem:
+                        case ClassIDType.ParticleSystemRenderer:
+                        case ClassIDType.GUILayer:
+                        case ClassIDType.FlareLayer:
+                        case ClassIDType.AudioListener:
+                        case ClassIDType.Cubemap:
                         case ClassIDType.UnknownType:
                             continue;
                     }
-                    
+
                     switch (asset)
                     {
                         case GameObject gameObject:
@@ -170,15 +189,20 @@ namespace ConsoleApp
                             //Console.WriteLine(asset.type + " " + monoScript.m_Name);
                             break;
                         case MonoBehaviour monoBehaviour:
-                            if(!monoBehaviour.m_Script.TryGet(out var result))
+                            if (!monoBehaviour.m_Script.TryGet(out var result))
                                 continue;
 
-                            if(monoBehaviour.m_Name == "")
-                                Console.WriteLine(asset.type + " " + result.m_Name);
+                            monoBehaviour.m_GameObject.TryGet(out var _gameObject);
+
+                            scripts.TryGetValue(result.m_Name, out var value);
+                            scripts[result.m_Name] = value + 1;
+
+                            if (monoBehaviour.m_Name == "")
+                                Console.WriteLine(asset.type + "[" + _gameObject.m_Name + "] " + result.m_Name);
                             else
                                 Console.WriteLine(asset.type + "[" + monoBehaviour.m_Name + "] " + result.m_Name);
-
-                            if (result.m_Name == "NGUIAtlas")
+                            
+                            if (result.m_Name == "UIAtlas" || result.m_Name == "NGUIAtlas")//NGUIFont
                                 monoBehaviour.ExportUISpriteData();
                             break;
                         case Shader shader:
@@ -187,6 +211,12 @@ namespace ConsoleApp
                         case Mesh mesh:
                             //Console.WriteLine(asset.type);
                             break;
+                        case MeshRenderer meshRenderer:
+                            break;
+                        case MeshFilter meshFilter:
+                            break;
+                        case Animation animation:
+                            break;
                         default:
                             count++;
                             //Console.WriteLine(asset.type + " " + count);
@@ -194,6 +224,11 @@ namespace ConsoleApp
                     }
                 }
             }
+
+            var list = scripts.Keys.ToList();
+            list.Sort();
+
+            Console.WriteLine(list);
         }
     }
 }
