@@ -22,6 +22,9 @@ namespace AssetStudio
 
         public void ExportUISpriteData()
         {
+            if (namePosition + 12 > reader.byteStart + reader.byteSize)
+                return;
+
             var position = reader.Position;
 
             reader.Position = namePosition + 12;
