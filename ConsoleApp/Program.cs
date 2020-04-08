@@ -171,7 +171,10 @@ namespace ConsoleApp
                             break;
                         case MonoBehaviour monoBehaviour:
                             monoBehaviour.m_Script.TryGet(out var result);
-                            Console.WriteLine(asset.type + " " + result.m_Name);
+                            Console.WriteLine(asset.type + "[" + monoBehaviour.m_Name + "] " + result.m_Name);
+
+                            if (result.m_Name == "NGUIAtlas")
+                                monoBehaviour.ExportUISpriteData();
                             break;
                         case Shader shader:
                             //Console.WriteLine(asset.type);
