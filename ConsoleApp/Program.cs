@@ -1,4 +1,5 @@
 ﻿using AssetStudio;
+using System;
 using System.IO;
 using System.Drawing.Imaging;
 
@@ -13,6 +14,35 @@ namespace ConsoleApp
                 return true;
             }
             Directory.CreateDirectory(Path.GetDirectoryName(filename));
+            return false;
+        }
+
+        public static bool ExportSprite(Sprite sprite, string exportPath)
+        {
+            ImageFormat format = null;
+            var type = "PNG";
+            switch (type)
+            {
+                case "BMP":
+                    format = ImageFormat.Bmp;
+                    break;
+                case "PNG":
+                    format = ImageFormat.Png;
+                    break;
+                case "JPEG":
+                    format = ImageFormat.Jpeg;
+                    break;
+            }
+            var exportFullName = exportPath + sprite.m_Name + "." + type.ToLower();
+            if (ExportFileExists(exportFullName))
+                return false;
+            var bitmap = SpriteHelper.GetImageFromSprite(sprite);
+            if (bitmap != null)
+            {
+                bitmap.Save(exportFullName, format);
+                bitmap.Dispose();
+                return true;
+            }
             return false;
         }
 
@@ -83,10 +113,12 @@ namespace ConsoleApp
         {
             var assetsManager = new AssetsManager();
 
-            //assetsManager.LoadFiles(@"C:\Users\lin\Desktop\Data\f50e2c51e98086b40be703f1806860b9");
+            //assetsManager.LoadFiles(@"C:\Users\lin\Desktop\Data\level0");
             //assetsManager.LoadFiles(@"C:\Users\lin\Desktop\Data\9147256f18c49e944a1ce8d4ec9fb0c7");
 
             assetsManager.LoadFolder(@"C:\Users\lin\Desktop\Data");
+
+            var count = 0;
             
             foreach (var assetsFile in assetsManager.assetsFileList)
             {
@@ -94,8 +126,31 @@ namespace ConsoleApp
                 {
                     var exportPath = @"C:\Users\lin\Desktop\Data\" + asset.type + @"\";
 
+                    switch(asset.type)
+                    {
+                        case ClassIDType.Light:
+                        case ClassIDType.Camera:
+                        case ClassIDType.ComputeShader:
+                        case ClassIDType.Rigidbody:
+                        case ClassIDType.PreloadData:
+                        case ClassIDType.Canvas:
+                        case ClassIDType.CanvasRenderer:
+                        case ClassIDType.UnknownType:
+                            continue;
+                    }
+                    
                     switch (asset)
                     {
+                        case GameObject gameObject:
+                            //Console.WriteLine(asset.type + " " + gameObject.m_Name);
+                            break;
+                        case Transform transform:
+                            //transform.m_GameObject.TryGet(out var result);
+                            //Console.WriteLine(asset.type + " " + result.m_Name);
+                            break;
+                        case Sprite sprite:
+                            ExportSprite(sprite, exportPath);
+                            break;
                         case Texture2D texture:
                             ExportTexture2D(texture, exportPath);
                             break;
@@ -104,6 +159,29 @@ namespace ConsoleApp
                             break;
                         case TextAsset textAsset:
                             ExportTextAsset(textAsset, exportPath);
+                            break;
+                        case Font font:
+                            //Console.WriteLine(asset.type);
+                            break;
+                        case Material material:
+                            //Console.WriteLine(asset.type);
+                            break;
+                        case MonoScript monoScript:
+                            //Console.WriteLine(asset.type + " " + monoScript.m_Name);
+                            break;
+                        case MonoBehaviour monoBehaviour:
+                            monoBehaviour.m_Script.TryGet(out var result);
+                            Console.WriteLine(asset.type + " " + result.m_Name);
+                            break;
+                        case Shader shader:
+                            //Console.WriteLine(asset.type);
+                            break;
+                        case Mesh mesh:
+                            //Console.WriteLine(asset.type);
+                            break;
+                        default:
+                            count++;
+                            //Console.WriteLine(asset.type + " " + count);
                             break;
                     }
                 }
